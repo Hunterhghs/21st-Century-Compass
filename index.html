@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>21st Century Compass — World Map Simulation 2025–2100 · H Heuristics</title>
+<meta name="description" content="Fixed-position world map simulation of the 21st century: Western collapse and blending, Africa's demographic rise, Asia's economic ascent, global convergence, the clean transition and AI diffusion, and the polycrisis survivability trap to 2100 and beyond.">
+<meta name="author" content="H Heuristics">
+<meta name="theme-color" content="#070b10">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="header">
+  <div class="brand">
+    <div class="mark">21st Century <em>Compass</em></div>
+    <div class="sub">World Map Simulation · 2025–2100 · H Heuristics</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="hdr-kpi" id="hdrKpis">
+    <div class="k"><b id="hdrPop" class="gold">—</b><span>World population</span></div>
+    <div class="k"><b id="hdrMedT" class="coral">—</b><span>Median human temp</span></div>
+    <div class="k"><b id="hdrAsia" class="teal">—</b><span>Asia output share</span></div>
+  </div>
+  <div class="badge" id="scenarioBadge">SSP2-4.5 · Middle Road</div>
+</header>
+
+<!-- ================= MAIN ================= -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <aside class="left-panel" id="leftPanel">
+
+    <section class="panel-section">
+      <h3><span class="tick"></span>Timeline</h3>
+      <div class="year-display">
+        <div class="yr" id="yearDisplay">2025<small>CE</small></div>
+        <div class="tl-btns">
+          <button class="tl-btn" id="btnPrev" aria-label="Previous year" title="Previous year">◀</button>
+          <button class="tl-btn" id="btnPlay" aria-label="Play simulation" title="Play / pause">▶</button>
+          <button class="tl-btn" id="btnNext" aria-label="Next year" title="Next year">▶▶</button>
+        </div>
+      </div>
+      <input type="range" id="yearSlider" min="2025" max="2100" step="1" value="2025" aria-label="Simulation year">
+      <div class="timeline-labels"><span>2025</span><span id="tlMidLabel">2050</span><span id="tlMaxLabel">2100</span></div>
+      <div class="speed-row">
+        Speed
+        <select id="speedSelect" aria-label="Playback speed">
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="2">2×</option>
+          <option value="4">4×</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer">
+          <input type="checkbox" id="longRunToggle"> Long run → 2500
+        </label>
+      </div>
+    </section>
+
+    <section class="panel-section">
+      <h3><span class="tick"></span>Scenario <span class="right">SSP × development pathway</span></h3>
+      <div class="btn-grid" id="scenarioGrid"></div>
+    </section>
+
+    <section class="panel-section">
+      <h3><span class="tick"></span>Map metric</h3>
+      <div class="btn-grid" id="metricGrid"></div>
+    </section>
+
+    <section class="panel-section">
+      <h3><span class="tick"></span>Theme lenses</h3>
+      <div class="btn-grid cols3" id="themeGrid"></div>
+    </section>
+
+    <section class="panel-section">
+      <h3><span class="tick"></span>Global dashboard <span class="right" id="kpiScenarioTag">SSP2-4.5</span></h3>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </section>
+
+  </aside>
+
+  <!-- MAP -->
+  <div class="map-container" id="mapContainer">
+    <svg id="mapSvg" role="img" aria-label="World choropleth simulation map"></svg>
+    <div class="map-tooltip" id="mapTooltip"></div>
+    <div class="map-legend" id="mapLegend"></div>
+    <div class="map-zoom">
+      <button class="zoom-btn" id="zoomIn" aria-label="Zoom in">+</button>
+      <button class="zoom-btn" id="zoomOut" aria-label="Zoom out">−</button>
+      <button class="zoom-btn" id="zoomReset" aria-label="Reset zoom">⌂</button>
+    </div>
+    <div class="map-watermark">H Heuristics · 21st Century Compass · simulation output, not prediction</div>
+    <div class="narrative-card" id="narrativeCard">
+      <button class="nc-close" id="ncClose" aria-label="Close narrative">✕</button>
+      <div class="nc-head" id="ncHead">The century in brief</div>
+      <p id="ncBody"></p>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel">
+    <div class="tabs">
+      <button class="tab active" data-tab="country">Country</button>
+      <button class="tab" data-tab="rank">Rankings</button>
+      <button class="tab" data-tab="brief">Briefing</button>
+      <button class="tab" data-tab="longrun">2500</button>
+    </div>
+    <div class="tab-body" id="tabCountry">
+      <div id="countryPlaceholder" class="muted" style="font-size:11px;line-height:1.6">
+        Select a country on the map to inspect its trajectory to 2100 — population, heat stress, pollution, economy, clean power and AI diffusion.
+      </div>
+      <div id="countryData" style="display:none">
+        <div class="country-name" id="cdName">—</div>
+        <div class="country-region" id="cdRegion">—</div>
+        <div class="cd-grid" id="cdGrid"></div>
+        <div class="cd-spark">
+          <div class="cs-title" id="cdSparkTitle">Population · 2025–2100</div>
+          <canvas id="cdSpark" height="130"></canvas>
+        </div>
+        <div class="cd-note" id="cdNote"></div>
+      </div>
+    </div>
+    <div class="tab-body" id="tabRank" style="display:none">
+      <div class="brief-block">
+        <div class="bb-title" id="rankTitle">Top 12 · <span id="rankMetricName"></span></div>
+        <div class="bb-sub" id="rankSub"></div>
+      </div>
+      <div id="rankTable"></div>
+    </div>
+    <div class="tab-body" id="tabBrief" style="display:none">
+      <div class="brief-block">
+        <div class="bb-title">Humanity by region</div>
+        <div class="bb-sub">UN medium-variant population shares through the century.</div>
+        <div class="brief-box"><canvas id="chartRegions" height="170"></canvas></div>
+      </div>
+      <div class="brief-block">
+        <div class="bb-title">Asia vs the West — share of world output</div>
+        <div class="bb-sub">GDP PPP trajectories under the selected scenario.</div>
+        <div class="brief-box"><canvas id="chartOutput" height="150"></canvas></div>
+      </div>
+      <div class="brief-block">
+        <div class="bb-title">Exposed &amp; trapped humanity</div>
+        <div class="bb-sub">Billions in unprecedented heat (≥29 °C), hot + polluted air, and the survivability-risk zone.</div>
+        <div class="brief-box"><canvas id="chartExposed" height="160"></canvas></div>
+      </div>
+    </div>
+    <div class="tab-body" id="tabLongrun" style="display:none">
+      <div class="longrun-card">
+        <h4>Centuries, not decades</h4>
+        <p>Warming stops only at net-zero CO₂ and then <b>holds</b>. The conditions of the 2090s are a <b>floor</b> for the centuries that follow — not a peak. Under a pessimistic reading the survivability-risk zone expands and deepens into a slow <b>polycrisis apocalypse</b>: cascading heat, pollution, water stress, crop failure and migration pressure compounding over centuries to millennia, with sea-level rise locked in for millennia.</p>
+      </div>
+      <div class="brief-block">
+        <div class="bb-title">The long-run floor · 2025–2500</div>
+        <div class="bb-sub">Median human temperature and survivability-risk-zone share, held at 2100 levels.</div>
+        <div class="brief-box"><canvas id="chartLongrun" height="170"></canvas></div>
+      </div>
+      <div class="brief-block">
+        <div class="bb-title">Polycrisis apocalypse — pessimistic tail</div>
+        <div class="bb-sub" style="font-size:10px;line-height:1.55;color:var(--ink-soft)">
+          In the pessimistic projection the late-century majority is <b style="color:var(--ink)">trapped</b> in regions where heat, polluted air, water stress and weak institutions compound. Feedback loops — heat → crop failure → migration → conflict → failed adaptation → more emissions from emergency cooling and burning biomass — can lock in decline over centuries. The report's central estimate keeps the trap at a large minority (~1.7 billion, ≈17%); the pessimistic tail makes it the <b style="color:var(--coral)">median human condition</b>.
+        </div>
+      </div>
+      <div class="brief-block">
+        <div class="bb-title">The upside engine</div>
+        <div class="bb-sub" style="font-size:10px;line-height:1.55;color:var(--ink-soft)">
+          Cheap solar (−89% module cost since 2010), AI-accelerated diffusion, girls' education and clean electricity are the levers that decide whether the trap shrinks or becomes the median. Technology now reaches poor countries in <b style="color:var(--ink)">years, not generations</b>.
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="bottom-bar">
+  <span class="src">Sources: <b>UN WPP 2024</b> · <b>World Bank CCKP CMIP6</b> · <b>Washington U. SatPM</b> · <b>World Bank GDP PPP</b> · <b>Lenton et al. 2023</b> · <b>Xu et al. 2020</b> · <b>H Heuristics HH-2026-25 &amp; DR 2026-69</b></span>
+  <span class="links">
+    <a href="https://researchreports.hheuristics.com/reports/century-compass/" target="_blank" rel="noopener">Century Compass</a>
+    <a href="https://digitalreports.hheuristics.com/reports/survivability-trap-demographic-shift/" target="_blank" rel="noopener">Survivability Trap</a>
+    <a href="https://hheuristics.com" target="_blank" rel="noopener">hheuristics.com</a>
+  </span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="js/world.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
